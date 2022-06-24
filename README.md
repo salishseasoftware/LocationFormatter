@@ -1,3 +1,9 @@
+[![Swift](https://github.com/salishseasoftware/LocationFormatter/actions/workflows/test.yml/badge.svg)](https://github.com/salishseasoftware/LocationFormatter/actions/workflows/test.yml)
+[![Latest Release](https://img.shields.io/github/release/salishseasoftware/LocationFormatter/all.svg)](https://github.com/salishseasoftware/LocationFormatter/releases)
+[![Swift 5.6+](https://img.shields.io/badge/Swift-5.6+-orange.svg)](https://developer.apple.com/swift)
+[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
+[![License](https://img.shields.io/github/license/salishseasoftware/LocationFormatter)](LICENSE)
+
 # LocationFormatter
 
 This package provides some Formatters that convert between coordinates and their textual representations.
