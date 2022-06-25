@@ -4,9 +4,9 @@ import Foundation
 public enum SymbolStyle {
     /// Uses no symbols, components must be space delimited.
     case none
-    /// Uses the degree (°) character for degrees, apostrophe (') for minutes, and quote (") character for seconds.
+    /// Uses the degree `°` character for degrees, apostrophe `'` for minutes, and quote `"` character for seconds.
     case simple
-    /// Uses the degree (°) character for degrees, and the prime (′) and double prime (″) characters for minutes and seconds.
+    /// Uses the degree `°` character for degrees, and the prime `′` and double prime `″` characters for minutes and seconds.
     case traditional
 
     /// Degrees symbol.
@@ -15,7 +15,7 @@ public enum SymbolStyle {
         case .none:
             return ""
         case .simple, .traditional:
-            return CoordinateSymbol.degree
+            return String(describing: CoordinateSymbol.degree)
         }
     }
 
@@ -25,9 +25,9 @@ public enum SymbolStyle {
         case .none:
             return ""
         case .simple:
-            return CoordinateSymbol.apostrophe
+            return String(describing: CoordinateSymbol.apostrophe)
         case .traditional:
-            return CoordinateSymbol.prime
+            return String(describing: CoordinateSymbol.prime)
         }
     }
 
@@ -37,9 +37,9 @@ public enum SymbolStyle {
         case .none:
             return ""
         case .simple:
-            return CoordinateSymbol.quote
+            return String(describing: CoordinateSymbol.quote)
         case .traditional:
-            return CoordinateSymbol.doublePrime
+            return String(describing: CoordinateSymbol.doublePrime)
         }
     }
 }

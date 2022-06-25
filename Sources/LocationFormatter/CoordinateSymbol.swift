@@ -1,23 +1,47 @@
 import Foundation
 
-enum CoordinateSymbol {
-    static let degree      = "\u{000B0}" // (°) &deg;
-    static let apostrophe  = "\u{0027}"  // (') &apos;
-    static let quote       = "\u{0022}"  // (") &quot;
-    static let prime       = "\u{02032}" // (′) &prime; DiacriticalAcute
-    static let doublePrime = "\u{2033}"  // (″) &Prime; DiacriticalDoubleAcute
-    static let singleSpace = "\u{0020}"  // ( ) &#x20;
+enum CoordinateSymbol: Character, CaseIterable {
+    /// Degree symbol `°`.
+    case degree = "\u{000B0}"
+    
+    /// Apostrophe symbol `'°'`.
+    case apostrophe = "\u{0027}"
+    
+    /// Quote symbol `"`.
+    case quote = "\u{0022}"
+    
+    /// Prime symbol `′` (DiacriticalAcute).
+    case prime = "\u{02032}"
+    
+    /// Double prime symbol `″` (DiacriticalDoubleAcute).
+    case doublePrime = "\u{2033}"
 }
 
-extension String {
+extension CoordinateSymbol: CustomStringConvertible {
+    var description: String {
+        String(describing: rawValue)
+    }
+}
+
+internal extension String {
     /// Replaces all symbols in string with a space character, and compacts multiple spaces.
-    internal func desymbolized() -> Self {
-        return self
-            .replacingOccurrences(of: CoordinateSymbol.degree, with: CoordinateSymbol.singleSpace)
-            .replacingOccurrences(of: CoordinateSymbol.apostrophe, with: CoordinateSymbol.singleSpace)
-            .replacingOccurrences(of: CoordinateSymbol.prime, with: CoordinateSymbol.singleSpace)
-            .replacingOccurrences(of: CoordinateSymbol.quote, with: CoordinateSymbol.singleSpace)
-            .replacingOccurrences(of: CoordinateSymbol.doublePrime, with: CoordinateSymbol.singleSpace)
-            .replacingOccurrences(of: #"\s{2,}"#, with: CoordinateSymbol.singleSpace, options: .regularExpression)
+    func desymbolized() -> Self {
+        
+        let symbols = CoordinateSymbol
+            .allCases
+            .map { String(describing:$0) }
+            .joined(separator: "|")
+        
+        guard let regex = try? NSRegularExpression(pattern: "[\(symbols)]") else {
+            return self
+        }
+        
+        return regex
+            .stringByReplacingMatches(in: self,
+                                      range: NSRange(location: 0, length: self.count),
+                                      withTemplate: " ")
+            .replacingOccurrences(of: #"\s{2,}"#,
+                                  with: " ",
+                                  options: .regularExpression)
     }
 }
