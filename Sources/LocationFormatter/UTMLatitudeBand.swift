@@ -1,20 +1,8 @@
 import CoreLocation
 import UTMConversion
 
-/**
- Latitude bands are not a part of UTM, but rather a part of the military grid reference system (MGRS). They
-are however sometimes used.
-
- Each zone is segmented into 20 latitude bands. Each latitude band is 8 degrees high, and is lettered starting
- from "C" at 80°S, increasing up the English alphabet until "X", omitting the letters "I" and "O" (because of
- their similarity to the numerals one and zero). The last latitude band, "X", is extended an extra 4 degrees,
- so it ends at 84°N latitude, thus covering the northernmost land on Earth.
-
- The combination of a zone and a latitude band defines a grid zone. The zone is always written first,
- followed by the latitude band. For example, a position in Toronto, Ontario, Canada, would find itself in
- zone 17 and latitude band "T", thus the full grid zone reference is "17T".
- */
-enum UTMLatitudeBand: String, CaseIterable, Comparable {
+/// Each UTM longitude zone is segmented into 20 latitude bands.
+public enum UTMLatitudeBand: String, CaseIterable, Comparable {
     case C, D, E, F, G, H, J, K, L, M, N, P, Q, R, S, T, U, V, W, X
 
     /// The hemisphere the latitude band is in.
@@ -55,12 +43,12 @@ enum UTMLatitudeBand: String, CaseIterable, Comparable {
         }
     }
 
-    static func < (lhs: UTMLatitudeBand, rhs: UTMLatitudeBand) -> Bool {
+    public static func < (lhs: UTMLatitudeBand, rhs: UTMLatitudeBand) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
 
-extension CLLocationCoordinate2D {
+public extension CLLocationCoordinate2D {
     /// The latitude band of the coordinate.
     var latitudeBand: UTMLatitudeBand? {
         return UTMLatitudeBand(coordinate: self)

@@ -243,15 +243,51 @@ public extension LocationCoordinateFormatter {
         return formatter
     }()
 
-    /// A LocationCoordinateFormatter configured to use decimal degrees (DD) format.
+    /**
+     A LocationCoordinateFormatter configured to use decimal degrees (DD) format.
+     
+    ```swift
+    let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+    let formatter = LocationCoordinateFormatter.decimalDegreesFormatter
+    formatter.string(from: coordinate)
+    // "48.11638° N, 122.77527° W"
+    ```
+     */
     static let decimalDegreesFormatter = LocationCoordinateFormatter(format: .decimalDegrees)
 
-    /// A LocationCoordinateFormatter configured to use degrees decimal minutes (DDM) format.
+    /**
+     A LocationCoordinateFormatter configured to use degrees decimal minutes (DDM) format.
+     
+    ```swift
+    let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+    let formatter = LocationCoordinateFormatter.degreesDecimalMinutesFormatter
+    formatter.string(from: coordinate)
+    // "48° 06.983' N, 122° 46.516' W"
+    ```
+     */
     static let degreesDecimalMinutesFormatter = LocationCoordinateFormatter(format: .degreesDecimalMinutes)
 
-    /// A LocationCoordinateFormatter configured to use degrees minutes seconds (DMS) format.
+    /**
+     A LocationCoordinateFormatter configured to use degrees minutes seconds (DMS) format.
+     
+    ```swift
+    let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+    let formatter = LocationCoordinateFormatter.degreesMinutesSecondsFormatter
+    formatter.string(from: coordinate)
+    // "48° 6' 59" N, 122° 46' 31" W"
+    ```
+     */
     static let degreesMinutesSecondsFormatter = LocationCoordinateFormatter(format: .degreesMinutesSeconds)
 
-    /// A LocationCoordinateFormatter configured to use universal trans mercator (UTM) format.
+    /**
+     A LocationCoordinateFormatter configured to use universal trans mercator (UTM) format.
+    
+   ```swift
+   let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+   let formatter = LocationCoordinateFormatter.utmFormatter
+   formatter.string(from: coordinate)
+   // "10U 516726m E 5329260m N"
+   ```
+    */
     static let utmFormatter = LocationCoordinateFormatter(format: .utm)
 }

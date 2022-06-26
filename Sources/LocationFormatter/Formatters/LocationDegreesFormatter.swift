@@ -20,12 +20,17 @@ import CoreLocation
 public final class LocationDegreesFormatter: Formatter {
     
     override public init() {
-        format = .decimalDegrees
+        self.degreesFormat = .decimalDegrees
         super.init()
     }
-
-    public init(format: DegreesFormat, displayOptions: DisplayOptions = []) {
-        self.format = format
+    
+    public init?(format: CoordinateFormat, displayOptions: DisplayOptions = []) {
+        guard let degreeFormat = DegreesFormat(coordinateFormat: format) else {
+            assertionFailure("Unsupported coordinate format: '\(String(describing: format))'")
+            return nil
+        }
+            
+        self.degreesFormat = degreeFormat
         self.displayOptions = displayOptions
         super.init()
     }
@@ -42,8 +47,19 @@ public final class LocationDegreesFormatter: Formatter {
     /// Default value is `.none`.
     public var orientation: CoordinateOrientation = .none
     
-    /// The format used by the receiver.
-    public var format: DegreesFormat
+    /// The coordinate format used by the receiver.
+    public var format: CoordinateFormat {
+        get {
+            return degreesFormat.coordinateFormat
+        }
+        set {
+            guard let degreeFormat = DegreesFormat(coordinateFormat: newValue) else {
+                assertionFailure("Unsupported coordinate format: '\(String(describing: newValue))'")
+                return
+            }
+            self.degreesFormat = degreeFormat
+        }
+    }
     
     /// The minimum number of digits after the decimal separator for degrees.
     ///
@@ -91,7 +107,7 @@ public final class LocationDegreesFormatter: Formatter {
 
         var components: [String] = []
 
-        switch format {
+        switch degreesFormat {
         case .decimalDegrees:
             let deg = degreesFormatter.string(from: NSNumber(value: degrees)) ?? "\(degrees)"
             components = ["\(deg)\(symbolStyle.degrees)"]
@@ -153,6 +169,8 @@ public final class LocationDegreesFormatter: Formatter {
     }
 
     // MARK: - Private
+    
+    private var degreesFormat: DegreesFormat
 
     private var isCompact: Bool {
         // cant be compact if not using symbols
@@ -221,7 +239,7 @@ public final class LocationDegreesFormatter: Formatter {
 
         var options: NSRegularExpression.Options = [.useUnicodeWordBoundaries]
         if parsingOptions.contains(.caseInsensitive) { options.insert(.caseInsensitive) }
-        let regex = try NSRegularExpression(pattern: format.regexPattern, options: options)
+        let regex = try NSRegularExpression(pattern: degreesFormat.regexPattern, options: options)
 
         let nsRange = NSRange(str.startIndex ..< str.endIndex, in: str)
         guard let match = regex.firstMatch(in: str, options: [.anchored], range: nsRange) else {
@@ -248,7 +266,7 @@ public final class LocationDegreesFormatter: Formatter {
             actualOrientation = direction.orientation
         }
 
-        if [DegreesFormat.degreesDecimalMinutes, DegreesFormat.degreesMinutesSeconds].contains(format) {
+        if [DegreesFormat.degreesDecimalMinutes, DegreesFormat.degreesMinutesSeconds].contains(degreesFormat) {
             let minutes = try self.minutes(inResult: match, for: str)
             let minutesAsDegrees = (minutes / 60)
             degrees += degrees < 0 ? -minutesAsDegrees : minutesAsDegrees
