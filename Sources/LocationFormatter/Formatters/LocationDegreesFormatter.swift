@@ -1,11 +1,22 @@
 import CoreLocation
 
-/// A formatter that converts between location degrees and their textual representations.
-///
-/// Instances of LocationDegreesFormatter create string representations of CLLocationDegrees, and convert
-/// textual representations of latitudes or longitudes into CLLocationDegrees instances.
-/// For user-visible representations of latitudes and longitudes, LocationDegreesFormatter provides a variety of
-/// configuration options.
+/**
+ A formatter that converts between `CLLocationDegrees` values and their textual representations.
+ 
+ Instances of LocationDegreesFormatter create string representations of `CLLocationDegrees` values,
+ and convert textual representations of degrees into `CLLocationDegrees` values.
+ 
+ Formatting a degree using a format and symbol style:
+ ```swift
+ let formatter = LocationDegreesFormatter()
+ formatter.format = .decimalDegrees
+ formatter.symbolStyle = .simple
+ format.displayOptions = [.suffix]
+ 
+ formatter.string(from: -122.77527)
+ // "122.77527° W"
+ ```
+ */
 public final class LocationDegreesFormatter: Formatter {
     
     override public init() {
@@ -26,25 +37,46 @@ public final class LocationDegreesFormatter: Formatter {
 
     // MARK: - Configuration
 
-    /// Defines whether a coordinate is intended to represent latitude or longitude. Default is `.none`.
+    /// Defines whether a coordinate is expected to represent latitude or longitude.
+    ///
+    /// Default value is `.none`.
     public var orientation: CoordinateOrientation = .none
+    
     /// The format used by the receiver.
     public var format: DegreesFormat
-    /// The minimum number of digits after the decimal separator for degrees. Default is 1.
+    
+    /// The minimum number of digits after the decimal separator for degrees.
+    ///
+    /// Default value is 1.
+    ///
+    /// - Important: Only applicable if `format` is `DegreesFormat.decimalDegrees`.
     public var minimumDegreesFractionDigits = 1
+    
     /// The maximum number of digits after the decimal separator for degrees.
-    /// Default is 5, which is accurate to 1.1132 meters (3.65 feet).
+    ///
+    /// The default value is 5, which is accurate to 1.1132 meters (3.65 feet).
+    ///
+    /// - Important: Only applicable if `format` is `DegreesFormat.decimalDegrees`.
     public var maximumDegreesFractionDigits = 5
+    
     /// Defines the characters used to annotate coordinate components.
+    ///
+    /// The default value is `SymbolStyle.simple`.
     public var symbolStyle: SymbolStyle = .simple
+    
     /// Options for display
+    ///
+    /// Default options include `DisplayOptions.suffx`.`
     public var displayOptions: DisplayOptions = [.suffix]
-    /// Options for parsing coordinates strings
+    
+    /// Options for parsing degree values from strings.
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.`
     public var parsingOptions: ParsingOptions = [.caseInsensitive]
 
     // MARK: - Public
 
-    /// Returns a string containing the formatted value of the provided ``CLLocationDegrees``.
+    /// Returns a string containing the formatted value of the provided `CLLocationDegrees`.
     public func string(from: CLLocationDegrees) -> String? {
         var degrees = from
 

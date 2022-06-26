@@ -1,13 +1,24 @@
 import CoreLocation
 import UTMConversion
 
-/// A formatter that converts between coordinates and their textual representations.
-///
-/// Instances of LocationCoordinateFormatter create string representations of CLLocationCoordinate2D instances,
-/// and convert textual representations of latitudes or longitudes into CLLocationCoordinate2d instances.
-///
-/// For user-visible representations of latitudes and longitudes, LocationCoordinateFormatter provides a variety of
-/// configuration options.
+/**
+ A formatter that converts between CLLocationCoordinate2d values and their textual representations.
+ 
+ Instances of LocationCoordinateFormatter create string representations of `CLLocationCoordinate2D` values,
+ and convert textual representations of coordinates into `CLLocationCoordinate2d` values.
+ 
+ Formatting a coordinate using a format and symbol style:
+ ```swift
+ let formatter = LocationCoordinateFormatter()
+ formatter.format = .decimalDegrees
+ formatter.symbolStyle = .simple
+ format.displayOptions = [.suffix]
+ 
+ let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+ formatter.string(from: coordinate)
+ // "48.11638° N, 122.77527° W"
+ ```
+ */
 public final class LocationCoordinateFormatter: Formatter {
     
     public init(format: CoordinateFormat = .decimalDegrees,
@@ -39,22 +50,31 @@ public final class LocationCoordinateFormatter: Formatter {
         didSet { updateFormat() }
     }
 
-    var displayOptions: DisplayOptions = [] {
+    /// Options for the string representation.
+    public var displayOptions: DisplayOptions = [] {
         didSet { updateDisplayOptions() }
     }
 
-    var parsingOptions: ParsingOptions = [] {
+    /// Options that control the parsing behavior.
+    public var parsingOptions: ParsingOptions = [] {
         didSet { updateParsingOptions() }
     }
 
-    /// The minimum number of digits after the decimal separator for degrees. Default is 1.
+    /// The minimum number of digits after the decimal separator for degrees.
+    ///
+    /// Default value is 1.
+    ///
+    /// - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
     public var minimumDegreesFractionDigits: Int {
         get { degreesFormatter.minimumDegreesFractionDigits }
         set { degreesFormatter.minimumDegreesFractionDigits = newValue }
     }
 
     /// The maximum number of digits after the decimal separator for degrees.
+    ///
     /// Default is 5, which is accurate to 1.1132 meters (3.65 feet).
+    ///
+    ///  - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
     public var maximumDegreesFractionDigits: Int {
         get { degreesFormatter.maximumDegreesFractionDigits }
         set { degreesFormatter.maximumDegreesFractionDigits = newValue }
@@ -66,7 +86,11 @@ public final class LocationCoordinateFormatter: Formatter {
         set { degreesFormatter.symbolStyle = newValue }
     }
 
-    /// The datum to use for UTM coordinates, defaults to WGS84.
+    /// The datum to use for UTM coordinates.
+    ///
+    /// Default value is WGS84.
+    ///
+    /// - Important: Only used when the ``format`` is `utm`.
     public var utmDatum: UTMDatum {
         get { utmFormatter.datum }
         set { utmFormatter.datum = newValue }

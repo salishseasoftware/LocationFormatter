@@ -1,38 +1,76 @@
 import Foundation
 
+/// The format uses to represent a `CLLocationCoordinate2d` value as a string.
 public enum CoordinateFormat: String {
     /// Decimal Degrees (DD).
+    ///
+    /// Commonly used on the web and computer systems.
+    ///
+    /// Example: `48.11638° N, 122.77527° W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case decimalDegrees
-    /// Degrees, Decimal Minutes (DDM).
+    /// Degrees and Decimal Minutes (DDM).
+    ///
+    /// Commonly used by electronic navigation equipment.
+    ///
+    /// - There are sixty minutes in a degree.
+    /// - One minute of _latitude_, equals one nautical mile.
+    ///
+    /// Example: `48° 06.983' N, 122° 46.516' W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case degreesDecimalMinutes
     /// Degrees, Minutes, Seconds (DMS).
+    ///
+    /// Commonly seen on printed charts and maps.
+    ///
+    /// - There are sixty seconds in one minute.
+    /// - There are sixty minutes in a degree.
+    /// - One minute of _latitude_, equals one nautical mile.
+    ///
+    /// Example: `48° 6' 59" N, 122° 46' 31" W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case degreesMinutesSeconds
     /// Universal Transverse Mercator (UTM).
+    ///
+    /// Example: `10U 516726m E 5329260m N`.
     case utm
 }
 
-/// The format used by the receiver.
+/// The format uses to represent a `CLLocationDegrees` value as a string.
 public enum DegreesFormat: String {
-    /// Decimal Degrees (DD)
+    /// Decimal Degrees (DD).
     ///
-    /// Examples
-    /// * `-114.012122`
-    /// * `-114.012122°`
-    /// * `114.012122° W`
+    /// Commonly used on the web and computer systems.
+    ///
+    /// Example: `122.77527° W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case decimalDegrees
-    /// Degrees, Decimal Minutes (DDM)
+    /// Degrees and Decimal Minutes (DDM).
     ///
-    /// Examples
-    /// * `-114 0.7273`
-    /// * `-114° 0.7273'`
-    /// * `114° 0.7273' W`
+    /// Commonly used by electronic navigation equipment.
+    ///
+    /// - There are sixty minutes in a degree.
+    /// - One minute of _latitude_, equals one nautical mile.
+    ///
+    /// Example: `122° 46.516' W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case degreesDecimalMinutes
-    /// Degrees, Minutes, Seconds (DMS)
+    /// Degrees, Minutes, Seconds (DMS).
     ///
-    /// Examples
-    /// * `-114 00 43.6398`
-    /// * `-114° 00' 43.6398"`
-    /// * `114° 00' 43.6398" W`
+    /// Commonly seen on printed charts and maps.
+    ///
+    /// - There are sixty seconds in one minute.
+    /// - There are sixty minutes in a degree.
+    /// - One minute of _latitude_, equals one nautical mile.
+    ///
+    /// Example: `122° 46' 31" W`.
+    ///
+    /// - Note: The cardinal direction can be represented either as a signed number _or_ using a prefix (N, S, E, W).
     case degreesMinutesSeconds
         
     var regexPattern: String {

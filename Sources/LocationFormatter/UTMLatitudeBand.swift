@@ -17,7 +17,7 @@ are however sometimes used.
 enum UTMLatitudeBand: String, CaseIterable, Comparable {
     case C, D, E, F, G, H, J, K, L, M, N, P, Q, R, S, T, U, V, W, X
 
-    /// The hemisphere the latitude band is in
+    /// The hemisphere the latitude band is in.
     var hemisphere: UTMHemisphere {
         self < .N ? .southern : .northern
     }
@@ -61,7 +61,7 @@ enum UTMLatitudeBand: String, CaseIterable, Comparable {
 }
 
 extension CLLocationCoordinate2D {
-    /// The latitude band for the coordinate.
+    /// The latitude band of the coordinate.
     var latitudeBand: UTMLatitudeBand? {
         return UTMLatitudeBand(coordinate: self)
     }

@@ -5,11 +5,15 @@ public enum SymbolStyle {
     /// Uses no symbols, components must be space delimited.
     case none
     /// Uses the degree `°` character for degrees, apostrophe `'` for minutes, and quote `"` character for seconds.
+    ///
+    /// Commonly used on the web and computer systems.
     case simple
     /// Uses the degree `°` character for degrees, and the prime `′` and double prime `″` characters for minutes and seconds.
+    ///
+    /// This is the typographically correct format as seen on paper charts and maps.
     case traditional
 
-    /// Degrees symbol.
+    /// The symbol use to annotate degrees.
     var degrees: String {
         switch self {
         case .none:
@@ -19,7 +23,7 @@ public enum SymbolStyle {
         }
     }
 
-    /// Minutes symbol.
+    /// The symbol use to annotate minutes.
     var minutes: String {
         switch self {
         case .none:
@@ -31,7 +35,7 @@ public enum SymbolStyle {
         }
     }
 
-    /// Seconds symbol.
+    /// The symbol use to annotate seconds.
     var seconds: String {
         switch self {
         case .none:

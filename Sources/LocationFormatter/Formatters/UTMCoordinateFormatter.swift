@@ -1,20 +1,37 @@
 import CoreLocation
 import UTMConversion
 
-/// A formatter that converts between UTM Coordinate and its textual representations.
-///
-/// Instances of UTMCoordinateFormatter create string representations of a UTMCoordinate, and convert
-/// textual representations of coordinates in UTM format into UTMCoordinate instances.
-/// 
-/// For user-visible representations of UTM coordinates, UTMCoordinateFormatter provides a variety of
-/// configuration options.
+/**
+ A formatter that converts between `CLLocationCoordinate2d` values and their string representations using the Universal Transverse Mercator (UTM) coordinate system.
+ 
+ Instances of UTMCoordinateFormatter create UTM string representations of `CLLocationCoordinate2D` values, and convert UTM textual representations of coordinates into `CLLocationCoordinate2d` values.
+ 
+Formatting a coordinate with the suffix display option:
+  
+ ```swift
+ let formatter = UTMCoordinateFormatter()
+ formatter.displayOptions =  [.suffix]
+ 
+ let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+ formatter.string(from: coordinate)
+ // "10U 516726m E 5329260m N"
+ ```
+ */
 public final class UTMCoordinateFormatter: Formatter {
     
-    /// The datum to use, defaults to WGS84
+    /// The datum to use.
+    ///
+    /// Default value is WGS84.
     public var datum: UTMDatum = .wgs84
+    
     /// Options for displaying UTM coordinates.
+    ///
+    /// Default options include `DisplayOptions.suffx`.`
     public var displayOptions: DisplayOptions = [.suffix]
+    
     /// Options for parsing coordinates strings
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.`
     public var parsingOptions: ParsingOptions = [.caseInsensitive]
 
     /// Returns a string containing the UTM formatted value of the provided `CLLocationDegrees`.
@@ -36,7 +53,7 @@ public final class UTMCoordinateFormatter: Formatter {
         return "\(gridZone) \(easting)\(eastingSuffix) \(northing)\(northingSuffix)"
     }
 
-    /// Returns a CLLocationCoordinate2D created by parsing a UTM string.
+    /// Returns a `CLLocationCoordinate2D` created by parsing a UTM string.
     public func coordinate(from string: String) throws -> CLLocationCoordinate2D {
         let str = parsingOptions.contains(.trimmed) ? string.trimmingCharacters(in: .whitespacesAndNewlines) : string
 
