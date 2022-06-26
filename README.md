@@ -10,7 +10,6 @@ This package provides some Formatters that convert between coordinates and their
 
 ## Usage
 
-
 ### LocationCoordinateFormatter
 
 This is the primary formatter for converting coordinates. It utilizes additional formatters for specific formats.

@@ -19,5 +19,13 @@ jobs:
         swift-version: "5.6.1"
     - name: Build
       run: swift build --disable-sandbox -v
+    - name: Build documentation
+      uses: fwcd/swift-docc-action@v1.0.2
+      with:
+        target: LocationFormatter
+        output: ./docs
+        hosting-base-path: LocationFormatter
+        disable-indexing: 'true'
+        transform-for-static-hosting: 'true'
     - name: Run tests
       run: swift test -v
