@@ -3,14 +3,29 @@ import Foundation
 /// Defines the characters used to annotate coordinate components.
 public enum SymbolStyle {
     /// Uses no symbols, components must be space delimited.
+    ///
+    /// Example:
+    /// ```
+    /// 48 6 59 N, 122 46 31 W
+    /// ```
     case none
-    /// Uses the degree `°` character for degrees, apostrophe `'` for minutes, and quote `"` character for seconds.
-    ///
     /// Commonly used on the web and computer systems.
-    case simple
-    /// Uses the degree `°` character for degrees, and the prime `′` and double prime `″` characters for minutes and seconds.
     ///
-    /// This is the typographically correct format as seen on paper charts and maps.
+    /// It uses the degree `°` symbol for degrees, the apostrophe `'` for minutes, and the quote `"` symbol for seconds.
+    ///
+    /// Example:
+    /// ```
+    /// 48° 6' 59" N, 122° 46' 31" W
+    /// ```
+    case simple
+    /// The typographically correct format commonly used on paper charts and maps.
+    ///
+    /// It uses the degree `°` symbol for degrees, the prime `′` symbol for minutes, and the double prime `″` symbol for seconds.
+    ///
+    /// Example:
+    /// ```
+    /// 48° 6′ 59″ N, 122° 46′ 31″ W
+    /// ```
     case traditional
 
     /// The symbol use to annotate degrees.

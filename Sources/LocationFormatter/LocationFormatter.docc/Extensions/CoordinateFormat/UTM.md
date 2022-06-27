@@ -22,5 +22,4 @@ A format representing a coordinate using the [Universal Transverse Mercator (UTM
 - ``LocationFormatter/CoordinateFormat/degreesDecimalMinutes``
 - ``LocationFormatter/CoordinateFormat/degreesMinutesSeconds``
 - ``LocationFormatter/DisplayOptions``
-- ``LocationFormatter/SymbolStyle``
 - ``LocationFormatter/UTMLatitudeBand``
