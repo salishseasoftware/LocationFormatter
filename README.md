@@ -1,6 +1,7 @@
 [![Swift](https://github.com/salishseasoftware/LocationFormatter/actions/workflows/test.yml/badge.svg)](https://github.com/salishseasoftware/LocationFormatter/actions/workflows/test.yml)
 [![Latest Release](https://img.shields.io/github/release/salishseasoftware/LocationFormatter/all.svg)](https://github.com/salishseasoftware/LocationFormatter/releases)
-[![Swift 5.6+](https://img.shields.io/badge/Swift-5.6+-orange.svg)](https://developer.apple.com/swift)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsalishseasoftware%2FLocationFormatter%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/salishseasoftware/LocationFormatter)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsalishseasoftware%2FLocationFormatter%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/salishseasoftware/LocationFormatter)
 [![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
 [![License](https://img.shields.io/github/license/salishseasoftware/LocationFormatter)](LICENSE)
 
