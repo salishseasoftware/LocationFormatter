@@ -13,9 +13,19 @@ Coordinates can be parsed from strings in any ``CoordinateFormat``, and accordin
 
 ## Topics
 
-
 ### Formatters
 
 - ``LocationCoordinateFormatter``
 - ``LocationDegreesFormatter``
 - ``UTMCoordinateFormatter``
+
+### Display configuration
+
+- ``CoordinateFormat``
+- ``SymbolStyle``
+- ``DisplayOptions``
+
+### Parsing configuration
+
+- ``LocationFormatter/ParsingOptions``
+- ``LocationFormatter/ParsingError``
