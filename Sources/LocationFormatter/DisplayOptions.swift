@@ -1,5 +1,3 @@
-import Foundation
-
 /// Display options
 public struct DisplayOptions: OptionSet {
     /// Use a suffix to to represent the cardinal direction of the coordinate.
@@ -13,7 +11,7 @@ public struct DisplayOptions: OptionSet {
     ///
     /// - Important: Only applies if the SymbolStyle is not `.none`.
     public static let compact = Self(rawValue: 1 << 1)
-
+    
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }

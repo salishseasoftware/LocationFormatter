@@ -35,6 +35,25 @@ public extension CLLocationCoordinate2D {
      the International Space Station when it passes overhead.
     */
     static let pointNemo = Self(latitude: -49.0273, longitude: -123.4345)
+    
+    /// Returns a new CLLocationCoordinate2D with a "normalized" longitude value.
+    ///
+    /// These transformations ate based on those defined in the [URI Comparison](https://datatracker.ietf.org/doc/html/rfc5870#section-3.4.4)
+    /// section of the `GeoURI` specification.
+    ///
+    /// - Longitude values corresponding to the international dateline (-180° and 180°) will be represented as 180.0, 
+    /// as they both identify the same physical longitude.
+    /// - The longitude values of polar locations, 90° or -90° latitude, will be converted to 0.0 as all longitudes are 0° at the poles.
+    func normalized() -> CLLocationCoordinate2D {
+        // International dateline - -180 and 180 are identical, so prefer 180.
+        var normalizedLongitude = longitude == -180.0 ? 180.0 : longitude
+        // longitude is zero at the poles
+        if latitude == -90.0 || latitude == 90.0 {
+            normalizedLongitude = .zero
+        }
+        
+        return CLLocationCoordinate2D(latitude: latitude, longitude: normalizedLongitude)
+    }
 }
 
 extension CLLocationCoordinate2D: Equatable {

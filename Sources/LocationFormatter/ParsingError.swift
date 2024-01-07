@@ -33,5 +33,7 @@ public enum ParsingError: Error, Equatable {
     
     /// The named string was not found.
     case notFound(name: String)
+    
+    /// The named coordinate references system (CRS) is not supported.
+    case unsupportedCoordinateReferenceSystem(crs: String)
 }
-
