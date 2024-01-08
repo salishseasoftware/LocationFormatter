@@ -18,6 +18,7 @@ Coordinates can be parsed from strings in any ``CoordinateFormat``, and accordin
 - ``LocationCoordinateFormatter``
 - ``LocationDegreesFormatter``
 - ``UTMCoordinateFormatter``
+- ``GeoURILocationFormatter``
 
 ### Display configuration
 

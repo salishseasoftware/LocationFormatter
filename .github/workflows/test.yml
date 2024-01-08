@@ -1,10 +1,13 @@
-name: Test
+# This workflow will build a Swift project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+
+name: Swift
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -13,19 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Swift
-      uses: swift-actions/setup-swift@v1.15.0
-      with:
-        swift-version: "5.6.1"
     - name: Build
-      run: swift build --disable-sandbox -v
-    - name: Build documentation
-      uses: fwcd/swift-docc-action@v1.0.2
-      with:
-        target: LocationFormatter
-        output: ./docs
-        hosting-base-path: LocationFormatter
-        disable-indexing: 'true'
-        transform-for-static-hosting: 'true'
+      run: swift build -v
     - name: Run tests
       run: swift test -v

@@ -70,7 +70,7 @@ public final class LocationDegreesFormatter: Formatter {
     
     /// The maximum number of digits after the decimal separator for degrees.
     ///
-    /// The default value is 5, which is accurate to 1.1132 meters (3.65 feet).
+    /// The default value is 5, which is accurate to 1.1132 meters (3.65 feet) at the equator.
     ///
     /// - Important: Only applicable if `format` is `DegreesFormat.decimalDegrees`.
     public var maximumDegreesFractionDigits = 5

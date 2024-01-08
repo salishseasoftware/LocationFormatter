@@ -79,7 +79,7 @@ extension DegreesFormat {
             self = .degreesDecimalMinutes
         case .degreesMinutesSeconds:
             self = .degreesMinutesSeconds
-        case .utm:
+        case .utm, .geoURI:
             return nil
         }
     }

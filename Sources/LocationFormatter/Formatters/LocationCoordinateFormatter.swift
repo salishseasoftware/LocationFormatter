@@ -42,6 +42,7 @@ public final class LocationCoordinateFormatter: Formatter {
 
     private lazy var degreesFormatter = LocationDegreesFormatter()
     private lazy var utmFormatter = UTMCoordinateFormatter()
+    private lazy var geoUriFormatter = GeoURILocationFormatter()
 
     // MARK: - Configuration
 
@@ -107,6 +108,8 @@ public final class LocationCoordinateFormatter: Formatter {
             return degreeString(from: coordinate)
         case .utm:
             return utmFormatter.string(from: coordinate)
+        case .geoURI:
+            return geoUriFormatter.string(fromCoordinate: coordinate)
         }
     }
 
@@ -117,6 +120,8 @@ public final class LocationCoordinateFormatter: Formatter {
             return try coordinateFrom(degreesString: string)
         case .utm:
             return try utmFormatter.coordinate(from: string)
+        case .geoURI:
+            return try geoUriFormatter.coordinate(from: string)
         }
     }
 
@@ -150,7 +155,7 @@ public final class LocationCoordinateFormatter: Formatter {
             degreesFormatter.format = .degreesDecimalMinutes
         case .degreesMinutesSeconds:
             degreesFormatter.format = .degreesMinutesSeconds
-        case .utm:
+        case .utm, .geoURI:
             break
         }
     }
@@ -165,6 +170,8 @@ public final class LocationCoordinateFormatter: Formatter {
             degreesFormatter.displayOptions = options
         case .utm:
             utmFormatter.displayOptions = options
+        case .geoURI:
+            break
         }
     }
 
@@ -178,6 +185,8 @@ public final class LocationCoordinateFormatter: Formatter {
             degreesFormatter.parsingOptions = options
         case .utm:
             utmFormatter.parsingOptions = options
+        case .geoURI:
+            geoUriFormatter.parsingOptions = options
         }
     }
 
@@ -290,4 +299,16 @@ public extension LocationCoordinateFormatter {
    ```
     */
     static let utmFormatter = LocationCoordinateFormatter(format: .utm)
+    
+    /**
+     A LocationCoordinateFormatter configured to use the GeoURI format.
+    
+   ```swift
+   let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
+   let formatter = LocationCoordinateFormatter.geoUriFormatter
+   formatter.string(from: coordinate)
+   // "geo:48.11638,-122.77527"
+   ```
+    */
+    static let geoUriFormatter = LocationCoordinateFormatter(format: .geoURI)
 }

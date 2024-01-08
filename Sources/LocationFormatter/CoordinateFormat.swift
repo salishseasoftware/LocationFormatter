@@ -20,6 +20,11 @@ public enum CoordinateFormat: String {
     
     /// Universal Transverse Mercator (UTM).
     case utm
+    
+    /// GeoURI.
+    ///
+    /// A Uniform Resource Identifier for Geographic Locations ('geo' URI).
+    case geoURI
 }
 
 extension CoordinateFormat: CustomStringConvertible {
