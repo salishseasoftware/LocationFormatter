@@ -163,12 +163,12 @@ public final class GeoURILocationFormatter: Formatter {
         formatter.numberStyle = .decimal
         formatter.generatesDecimalNumbers = true
         formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 11
+        // 8 decimal places represents 1.1132 mm at the equator.
+        formatter.maximumFractionDigits = 8
         formatter.decimalSeparator = "."
         formatter.positivePrefix = ""
         formatter.negativePrefix = "-"
-        formatter.hasThousandSeparators = false
-        formatter.localizesFormat = false
+        formatter.groupingSeparator = ""
         return formatter
     }()
 }
