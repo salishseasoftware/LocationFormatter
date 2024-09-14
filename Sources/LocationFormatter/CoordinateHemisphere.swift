@@ -42,3 +42,9 @@ public enum CoordinateHemisphere: String {
         }
     }
 }
+
+extension CoordinateHemisphere: CustomStringConvertible {
+    public var description: String {
+        rawValue
+    }
+}

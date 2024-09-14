@@ -1,38 +1,34 @@
 import CoreLocation
-import XCTest
+import Testing
 @testable import LocationFormatter
 
 
-final class CLLocationCoordinate2DTests: XCTestCase {
-
-    func testDatelineNormalization() {
-        var coordinate: CLLocationCoordinate2D = .pointNemo
-        var normalized = coordinate.normalized()
-        XCTAssertEqual(-48.876667, normalized.latitude)
-        XCTAssertEqual(-123.393333, normalized.longitude)
+struct CLLocationCoordinate2DTests {
+    @Test("Dateline coordinate normalization") func datelineNormalization() {
+        var actual: CLLocationCoordinate2D = .pointNemo.normalized()
+        #expect(actual.latitude == -48.876667)
+        #expect(actual.longitude == -123.393333)
         
-        coordinate = CLLocationCoordinate2D(latitude: -48.876667, longitude: 180)
-        normalized = coordinate.normalized()
-        XCTAssertEqual(-48.876667, normalized.latitude)
-        XCTAssertEqual(180.0, normalized.longitude)
+        actual = CLLocationCoordinate2D(latitude: -48.876667, longitude: 180).normalized()
+        #expect(actual.latitude == -48.876667)
+        #expect(actual.longitude == 180.0)
         
-        coordinate = CLLocationCoordinate2D(latitude: -48.876667, longitude: -180)
-        normalized = coordinate.normalized()
-        XCTAssertEqual(-48.876667, normalized.latitude)
-        XCTAssertEqual(180.0, normalized.longitude)
+        actual = CLLocationCoordinate2D(latitude: -48.876667, longitude: -180).normalized()
+        #expect(actual.latitude == -48.876667)
+        #expect(actual.longitude == 180.0)
     }
     
-    func testPolarLongitude() {
+    @Test("Polar longitude  coordinate normalization") func polarLongitude() {
         var actual = CLLocationCoordinate2D.pointNemo.normalized()
-        XCTAssertEqual(-48.876667, actual.latitude)
-        XCTAssertEqual(-123.393333, actual.longitude)
+        #expect(actual.latitude == -48.876667)
+        #expect(actual.longitude == -123.393333)
         
         actual = CLLocationCoordinate2D(latitude: 90, longitude: -123.393333).normalized()
-        XCTAssertEqual(90.0, actual.latitude)
-        XCTAssertEqual(.zero, actual.longitude)
+        #expect(actual.latitude == 90.0)
+        #expect(actual.longitude == .zero)
         
         actual = CLLocationCoordinate2D(latitude: -90, longitude: -123.393333).normalized()
-        XCTAssertEqual(-90.0, actual.latitude)
-        XCTAssertEqual(.zero, actual.longitude)
+        #expect(actual.latitude == -90.0)
+        #expect(actual.longitude == .zero)
     }
 }

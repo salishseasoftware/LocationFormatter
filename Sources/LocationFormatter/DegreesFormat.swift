@@ -1,7 +1,8 @@
 import Foundation
+import RegexBuilder
 
 /// The format uses to represent a `CLLocationDegrees` value as a string.
-enum DegreesFormat: String {
+enum DegreesFormat: String, Codable {
     
     /// Decimal Degrees (DD).
     case decimalDegrees

@@ -12,13 +12,24 @@ import CoreLocation
 */
 public final class GeoURILocationFormatter: Formatter {
     
-    /// Options for parsing coordinates strings.
-    ///
-    /// Default options include `ParsingOptions.caseInsensitive`.
-    public var parsingOptions: ParsingOptions = [.caseInsensitive]
+    /// Creates a new GeoURILocationFormatter.
+    /// - Parameters:
+    ///   - options: ``GeoURIFormatOptions`` for converting between `CLLocation` objects and GeoURI strings.
+    ///   - parsingOptions: ``ParsingOptions`` for parsing coordinates strings.
+    public init(
+        options: GeoURIFormatOptions = [.normalizeLongitude],
+        parsingOptions: ParsingOptions = [.caseInsensitive]
+
+    ) {
+        self.options = options
+        self.parsingOptions = parsingOptions
+        super.init()
+    }
     
-    /// Options for converting between `CLLocation` objects and GeoURI strings.
-    public var options: GeoURIFormatOptions = [.normalizeLongitude]
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     /// Returns a `GeoURI` string representation of a `CLLocation` object.
     public func string(fromLocation location: CLLocation) -> String? {
@@ -158,7 +169,17 @@ public final class GeoURILocationFormatter: Formatter {
     
     // MARK: - Internal
     
-    static var numberFormatter: NumberFormatter = {
+    /// Options for converting between `CLLocation` objects and GeoURI strings.
+    let options: GeoURIFormatOptions
+    
+    /// Options for parsing coordinates strings.
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.
+    let parsingOptions: ParsingOptions
+    
+    // MARK: - Private
+    
+    private static let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.generatesDecimalNumbers = true
@@ -172,4 +193,3 @@ public final class GeoURILocationFormatter: Formatter {
         return formatter
     }()
 }
-

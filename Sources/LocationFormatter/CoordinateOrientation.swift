@@ -1,9 +1,9 @@
 import CoreLocation
 
 /// Defines whether a `CLLocationDegrees` is intended to represent latitude or longitude.
-public enum CoordinateOrientation {
+public enum CoordinateOrientation: Codable {
     /// Unspecified.
-    case none
+    case unspecified
     /// The coordinate represents a latitude.
     case latitude
     /// The coordinate represents a longitude.
@@ -14,7 +14,7 @@ public enum CoordinateOrientation {
         switch self {
         case .latitude:
             return -90.0 ... 90.0
-        case .longitude, .none:
+        case .longitude, .unspecified:
             return -180.0 ... 180.0
         }
     }
@@ -31,8 +31,10 @@ public enum CoordinateOrientation {
         case .longitude:
             guard (-180.0 ... 180.0).contains(degrees) else { return nil }
             return degrees >= 0.0 ? .east : .west
-        case .none:
+        case .unspecified:
             return nil
         }
     }
 }
+
+

@@ -9,8 +9,7 @@ import UTMConversion
 Formatting a coordinate with the suffix display option:
   
  ```swift
- let formatter = UTMCoordinateFormatter()
- formatter.displayOptions =  [.suffix]
+ let formatter = UTMCoordinateFormatter(displayOptions = [.suffix])
  
  let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
  formatter.string(from: coordinate)
@@ -18,27 +17,34 @@ Formatting a coordinate with the suffix display option:
  ```
  */
 public final class UTMCoordinateFormatter: Formatter {
+    /// Creates a new `UTMCoordinateFormatter`.
+    /// - Parameters:
+    ///   - displayOptions: ``DisplayOptions`` for displaying UTM coordinates.
+    ///   - parsingOptions: ``ParsingOptions`` for parsing coordinates from a string.
+    ///   - datum: The datum to use. The default value is `WGS84`.
+    public init(
+        displayOptions: DisplayOptions = [.suffix],
+        parsingOptions: ParsingOptions = [.caseInsensitive],
+        datum: UTMDatum = .wgs84
+    ) {
+        self.displayOptions = displayOptions
+        self.parsingOptions = parsingOptions
+        self.datum = datum
+        super.init()
+    }
     
-    /// The datum to use.
-    ///
-    /// Default value is WGS84.
-    public var datum: UTMDatum = .wgs84
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-    /// Options for displaying UTM coordinates.
-    ///
-    /// Default options include `DisplayOptions.suffx`.`
-    public var displayOptions: DisplayOptions = [.suffix]
-    
-    /// Options for parsing coordinates strings
-    ///
-    /// Default options include `ParsingOptions.caseInsensitive`.`
-    public var parsingOptions: ParsingOptions = [.caseInsensitive]
-
     /// Returns a string containing the UTM formatted value of the provided `CLLocationDegrees`.
     public func string(from coordinate: CLLocationCoordinate2D) -> String? {
         guard CLLocationCoordinate2DIsValid(coordinate) else { return nil }
 
-        let utmCoordinate = coordinate.utmCoordinate(datum: datum)
+        guard let utmCoordinate = try? coordinate.utmCoordinate(datum: datum) else {
+            return nil
+        }
 
         var gridZone = "\(utmCoordinate.zone)"
         if let latitudeBand = coordinate.latitudeBand { gridZone += latitudeBand.rawValue }
@@ -89,10 +95,6 @@ public final class UTMCoordinateFormatter: Formatter {
         return coordinate
     }
 
-    private var isCompact: Bool {
-        displayOptions.contains(.compact)
-    }
-
     // MARK: - Formatter
 
     override public func string(for obj: Any?) -> String? {
@@ -112,8 +114,32 @@ public final class UTMCoordinateFormatter: Formatter {
             return false
         }
     }
+    
+    // AMRK: - Internal
+    
+    /// Options for displaying UTM coordinates.
+    ///
+    /// Default options include `DisplayOptions.suffix`.`
+    let displayOptions: DisplayOptions
+    
+    /// Options for parsing coordinates strings
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.`
+    let parsingOptions: ParsingOptions
+    
+    /// The datum to use.
+    ///
+    /// Default value is WGS84.
+    let datum: UTMDatum
+    
+    
+    // MARK: - Private
+    
+    private var isCompact: Bool {
+        displayOptions.contains(.compact)
+    }
 
-    let regexPattern: String = #"""
+    private let regexPattern: String = #"""
     (?x)
     (?# UTM Zone 1-60)
     (?<ZONE>(0?[1-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]|60))
@@ -138,7 +164,7 @@ private extension UTMCoordinate {
         return Self.numberFormatter.string(from: NSNumber(value: northing))
     }
 
-    static var numberFormatter: NumberFormatter = {
+    static let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.locale = Locale.current
         formatter.numberStyle = .none

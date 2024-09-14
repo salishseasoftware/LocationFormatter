@@ -8,13 +8,16 @@ public extension String {
     /// Degrees Minutes Seconds, or UTM formats.
     ///
     /// - Returns: the recognized coordinate value.
-    func coordinate() -> CLLocationCoordinate2D? {
+    func coordinate() -> CLLocationCoordinate2D?  {
         var coordinate: CLLocationCoordinate2D?
 
-        let formatters: [LocationCoordinateFormatter] = [LocationCoordinateFormatter.decimalDegreesFormatter,
-                                                         LocationCoordinateFormatter.degreesDecimalMinutesFormatter,
-                                                         LocationCoordinateFormatter.degreesMinutesSecondsFormatter,
-                                                         LocationCoordinateFormatter.utmFormatter]
+        let formatters: [LocationCoordinateFormatter] = [
+            LocationCoordinateFormatter(format: .decimalDegrees),
+            LocationCoordinateFormatter(format: .degreesDecimalMinutes),
+            LocationCoordinateFormatter(format: .degreesMinutesSeconds),
+            LocationCoordinateFormatter(format: .utm),
+            LocationCoordinateFormatter(format: .geoURI),
+        ]
 
         for formatter in formatters {
             if let coord = try? formatter.coordinate(from: self) {

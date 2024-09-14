@@ -7,12 +7,13 @@ import UTMConversion
  Instances of LocationCoordinateFormatter create string representations of `CLLocationCoordinate2D` values,
  and convert textual representations of coordinates into `CLLocationCoordinate2d` values.
  
- Formatting a coordinate using a format and symbol style:
+ Formatting a coordinate using a format, a symbol style, and display options:
  ```swift
- let formatter = LocationCoordinateFormatter()
- formatter.format = .decimalDegrees
- formatter.symbolStyle = .simple
- format.displayOptions = [.suffix]
+ let formatter = LocationCoordinateFormatter(
+    format = .decimalDegrees,
+    symbolStyle = .simple,
+    displayOptions = [.suffix]
+ )
  
  let coordinate = CLLocationCoordinate2D(latitude: 48.11638, longitude: -122.77527)
  formatter.string(from: coordinate)
@@ -21,18 +22,33 @@ import UTMConversion
  */
 public final class LocationCoordinateFormatter: Formatter {
     
-    public init(format: CoordinateFormat = .decimalDegrees,
-                displayOptions: DisplayOptions = [.suffix],
-                parsingOptions: ParsingOptions = [.caseInsensitive]) {
+    /// Creates a new LocationCoordinateFormatter.
+    /// - Parameters:
+    ///   - format: The ``CoordinateFormat`` used to represent a `CLLocationDegrees` value as a string.
+    ///   - symbolStyle: The ``SymbolStyle`` used to annotate coordinate components.
+    ///   - displayOptions: The ``DisplayOptions`` for creating a textutal representation of a `CLLocationDegrees` value.
+    ///   - parsingOptions: he ``ParsingOptions`` for parsing `CLLocationDegrees` values from strings.
+    ///   - minimumDegreesFractionDigits: The minimum number of digits after the decimal separator for degrees.
+    ///   - maximumDegreesFractionDigits: The maximum number of digits after the decimal separator for degrees.
+    ///   - datum: The datum used with a UTM ``CoordinateFormat``. The default value is `WGS84`.
+    public init(
+        format: CoordinateFormat = .decimalDegrees,
+        symbolStyle: SymbolStyle = .traditional,
+        displayOptions: DisplayOptions = [.suffix],
+        parsingOptions: ParsingOptions = [.caseInsensitive],
+        minimumDegreesFractionDigits: Int = 1,
+        maximumDegreesFractionDigits: Int = 5,
+        datum: UTMDatum = .wgs84
+    ) {
         self.format = format
+        self.symbolStyle = symbolStyle
         self.displayOptions = displayOptions
         self.parsingOptions = parsingOptions
+        self.minimumDegreesFractionDigits = minimumDegreesFractionDigits
+        self.maximumDegreesFractionDigits = maximumDegreesFractionDigits
+        self.datum = datum
 
         super.init()
-
-        updateFormat()
-        updateDisplayOptions()
-        updateParsingOptions()
     }
 
     @available(*, unavailable)
@@ -40,64 +56,7 @@ public final class LocationCoordinateFormatter: Formatter {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var degreesFormatter = LocationDegreesFormatter()
-    private lazy var utmFormatter = UTMCoordinateFormatter()
-    private lazy var geoUriFormatter = GeoURILocationFormatter()
-
-    // MARK: - Configuration
-
-    /// The coordinate format used by the receiver.
-    public var format: CoordinateFormat {
-        didSet { updateFormat() }
-    }
-
-    /// Options for the string representation.
-    public var displayOptions: DisplayOptions = [] {
-        didSet { updateDisplayOptions() }
-    }
-
-    /// Options that control the parsing behavior.
-    public var parsingOptions: ParsingOptions = [] {
-        didSet { updateParsingOptions() }
-    }
-
-    /// The minimum number of digits after the decimal separator for degrees.
-    ///
-    /// Default value is 1.
-    ///
-    /// - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
-    public var minimumDegreesFractionDigits: Int {
-        get { degreesFormatter.minimumDegreesFractionDigits }
-        set { degreesFormatter.minimumDegreesFractionDigits = newValue }
-    }
-
-    /// The maximum number of digits after the decimal separator for degrees.
-    ///
-    /// Default is 5, which is accurate to 1.1132 meters (3.65 feet).
-    ///
-    ///  - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
-    public var maximumDegreesFractionDigits: Int {
-        get { degreesFormatter.maximumDegreesFractionDigits }
-        set { degreesFormatter.maximumDegreesFractionDigits = newValue }
-    }
-
-    /// Defines the characters used to annotate coordinate components.
-    public var symbolStyle: SymbolStyle {
-        get { degreesFormatter.symbolStyle }
-        set { degreesFormatter.symbolStyle = newValue }
-    }
-
-    /// The datum to use for UTM coordinates.
-    ///
-    /// Default value is WGS84.
-    ///
-    /// - Important: Only used when the ``format`` is `utm`.
-    public var utmDatum: UTMDatum {
-        get { utmFormatter.datum }
-        set { utmFormatter.datum = newValue }
-    }
-
-    // MARK: - Public API
+    // MARK: - Public
     
     /// Returns a string containing the formatted value of the provided coordinate.
     public func string(from coordinate: CLLocationCoordinate2D) -> String? {
@@ -128,15 +87,13 @@ public final class LocationCoordinateFormatter: Formatter {
     /// Returns a string containing the formatted latitude of the provided coordinate.
     public func latitudeString(from coordinate: CLLocationCoordinate2D) -> String? {
         guard CLLocationCoordinate2DIsValid(coordinate) else { return nil }
-        degreesFormatter.orientation = .latitude
-        return degreesFormatter.string(from: coordinate.latitude)
+        return degreesFormatter.string(from: coordinate.latitude, orientation: .latitude)
     }
 
     /// Returns a string containing the formatted longitude of the provided coordinate.
     public func longitudeString(from coordinate: CLLocationCoordinate2D) -> String? {
         guard CLLocationCoordinate2DIsValid(coordinate) else { return nil }
-        degreesFormatter.orientation = .longitude
-        return degreesFormatter.string(from: coordinate.longitude)
+        return degreesFormatter.string(from: coordinate.longitude, orientation: .longitude)
     }
 
     /// Returns an CLLocation object created by parsing a given string.
@@ -144,51 +101,48 @@ public final class LocationCoordinateFormatter: Formatter {
         let coord = try coordinate(from: str)
         return CLLocation(latitude: coord.latitude, longitude: coord.longitude)
     }
+    
+    // MARK: - Internal
+
+    /// The coordinate format used by the receiver.
+    let format: CoordinateFormat
+    
+    /// Options for display
+    ///
+    /// Default options include `DisplayOptions.suffix`.`
+    let displayOptions: DisplayOptions
+    
+    /// Options for parsing degree values from strings.
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.`
+    let parsingOptions: ParsingOptions
+    
+
+    /// The minimum number of digits after the decimal separator for degrees.
+    ///
+    /// Default value is 1.
+    ///
+    /// - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
+    let minimumDegreesFractionDigits: Int
+
+    /// The maximum number of digits after the decimal separator for degrees.
+    ///
+    /// Default is 5, which is accurate to 1.1132 meters (3.65 feet).
+    ///
+    ///  - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
+    let maximumDegreesFractionDigits: Int
+
+    /// Defines the characters used to annotate coordinate components.
+    let symbolStyle: SymbolStyle
+
+    /// The datum to use for UTM coordinates.
+    ///
+    /// Default value is WGS84.
+    ///
+    /// - Important: Only used when the ``format`` is `utm`.
+    let datum: UTMDatum
 
     // MARK: - Private
-    
-    private func updateFormat() {
-        switch format {
-        case .decimalDegrees:
-            degreesFormatter.format = .decimalDegrees
-        case .degreesDecimalMinutes:
-            degreesFormatter.format = .degreesDecimalMinutes
-        case .degreesMinutesSeconds:
-            degreesFormatter.format = .degreesMinutesSeconds
-        case .utm, .geoURI:
-            break
-        }
-    }
-
-    private func updateDisplayOptions() {
-        var options: DisplayOptions = []
-        if displayOptions.contains(.suffix) { options.insert(.suffix) }
-        if displayOptions.contains(.compact) { options.insert(.compact) }
-
-        switch format {
-        case .decimalDegrees, .degreesDecimalMinutes, .degreesMinutesSeconds:
-            degreesFormatter.displayOptions = options
-        case .utm:
-            utmFormatter.displayOptions = options
-        case .geoURI:
-            break
-        }
-    }
-
-    private func updateParsingOptions() {
-        var options: ParsingOptions = []
-        if parsingOptions.contains(.caseInsensitive) { options.insert(.caseInsensitive) }
-        if parsingOptions.contains(.trimmed) { options.insert(.trimmed) }
-
-        switch format {
-        case .decimalDegrees, .degreesDecimalMinutes, .degreesMinutesSeconds:
-            degreesFormatter.parsingOptions = options
-        case .utm:
-            utmFormatter.parsingOptions = options
-        case .geoURI:
-            geoUriFormatter.parsingOptions = options
-        }
-    }
 
     private func degreeString(from coordinate: CLLocationCoordinate2D) -> String? {
         guard let lat = latitudeString(from: coordinate), let lon = longitudeString(from: coordinate) else {
@@ -240,17 +194,37 @@ public final class LocationCoordinateFormatter: Formatter {
             return false
         }
     }
+    
+    // MARK: - Formatters
+    
+    private lazy var degreesFormatter = LocationDegreesFormatter(
+        format: format,
+        symbolStyle: symbolStyle,
+        displayOptions: displayOptions,
+        parsingOptions: parsingOptions,
+        minimumDegreesFractionDigits: minimumDegreesFractionDigits,
+        maximumDegreesFractionDigits: maximumDegreesFractionDigits
+    )
+    
+    private lazy var utmFormatter = UTMCoordinateFormatter(
+        displayOptions: displayOptions,
+        parsingOptions: parsingOptions,
+        datum: datum
+    )
+    
+    private lazy var geoUriFormatter = GeoURILocationFormatter(
+        parsingOptions: parsingOptions
+    )
 }
 
 public extension LocationCoordinateFormatter {
     /// Simple decimal format (46.853063, -114.012122)
-    static let decimalFormatter: LocationCoordinateFormatter = {
-        let formatter = LocationCoordinateFormatter()
-        formatter.format = .decimalDegrees
-        formatter.symbolStyle = .none
-        formatter.displayOptions = []
-        return formatter
-    }()
+    @MainActor
+    static let decimalFormatter = LocationCoordinateFormatter(
+        format: .decimalDegrees,
+        symbolStyle: .none,
+        displayOptions: []
+    )
 
     /**
      A LocationCoordinateFormatter configured to use decimal degrees (DD) format.
@@ -262,7 +236,8 @@ public extension LocationCoordinateFormatter {
     // "48.11638° N, 122.77527° W"
     ```
      */
-    static let decimalDegreesFormatter = LocationCoordinateFormatter(format: .decimalDegrees)
+    @MainActor 
+    static let decimalDegreesFormatter = LocationCoordinateFormatter()
 
     /**
      A LocationCoordinateFormatter configured to use degrees decimal minutes (DDM) format.
@@ -274,7 +249,12 @@ public extension LocationCoordinateFormatter {
     // "48° 06.983' N, 122° 46.516' W"
     ```
      */
-    static let degreesDecimalMinutesFormatter = LocationCoordinateFormatter(format: .degreesDecimalMinutes)
+    @MainActor 
+    static let degreesDecimalMinutesFormatter = LocationCoordinateFormatter(
+        format: .degreesDecimalMinutes,
+        symbolStyle: .simple,
+        displayOptions: [.suffix]
+    )
 
     /**
      A LocationCoordinateFormatter configured to use degrees minutes seconds (DMS) format.
@@ -286,7 +266,12 @@ public extension LocationCoordinateFormatter {
     // "48° 6' 59" N, 122° 46' 31" W"
     ```
      */
-    static let degreesMinutesSecondsFormatter = LocationCoordinateFormatter(format: .degreesMinutesSeconds)
+    @MainActor 
+    static let degreesMinutesSecondsFormatter = LocationCoordinateFormatter(
+        format: .degreesMinutesSeconds,
+        symbolStyle: .simple,
+        displayOptions: [.suffix]
+    )
 
     /**
      A LocationCoordinateFormatter configured to use universal trans mercator (UTM) format.
@@ -298,6 +283,7 @@ public extension LocationCoordinateFormatter {
    // "10U 516726m E 5329260m N"
    ```
     */
+    @MainActor
     static let utmFormatter = LocationCoordinateFormatter(format: .utm)
     
     /**
@@ -310,5 +296,6 @@ public extension LocationCoordinateFormatter {
    // "geo:48.11638,-122.77527"
    ```
     */
+    @MainActor 
     static let geoUriFormatter = LocationCoordinateFormatter(format: .geoURI)
 }

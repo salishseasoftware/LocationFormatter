@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "DE300CFC-0343-4422-85AE-CBDB1C37F655",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "LocationFormatterTests",
+        "name" : "LocationFormatterTests"
+      }
+    }
+  ],
+  "version" : 1
+}

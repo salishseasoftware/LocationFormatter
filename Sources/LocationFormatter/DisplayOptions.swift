@@ -1,5 +1,5 @@
-/// Display options
-public struct DisplayOptions: OptionSet {
+ /// Display options
+public struct DisplayOptions: OptionSet, Sendable, Codable, Hashable {
     /// Use a suffix to to represent the cardinal direction of the coordinate.
     ///
     /// E.G. "122.77527 W" instead of  "-122.77527"
@@ -12,9 +12,10 @@ public struct DisplayOptions: OptionSet {
     /// - Important: Only applies if the SymbolStyle is not `.none`.
     public static let compact = Self(rawValue: 1 << 1)
     
-    public init(rawValue: Int) {
+    nonisolated public init(rawValue: Int) {
         self.rawValue = rawValue
     }
 
     public let rawValue: Int
 }
+

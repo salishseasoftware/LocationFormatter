@@ -1,24 +1,28 @@
 import XCTest
 import CoreLocation
+import Numerics
+
 @testable import LocationFormatter
 
-
-public func XCTAssertEqualCoordinates(_ expected: CLLocationCoordinate2D,
-                                      _ actual: CLLocationCoordinate2D?,
-                                      accuracy: Double? = nil,
-                                      file: StaticString = #file,
-                                      line: UInt = #line) {
-    guard let lat = actual?.latitude, let lon = actual?.longitude else {
-        XCTAssertNotNil(actual)
-        return
-    }
-
-    if let accuracy = accuracy {
-        XCTAssertEqual(lat, expected.latitude, accuracy: accuracy, file: file, line: line)
-        XCTAssertEqual(lon, expected.longitude, accuracy: accuracy, file: file, line: line)
-    } else {
-        XCTAssertEqual(lat, expected.latitude, file: file, line: line)
-        XCTAssertEqual(lon, expected.longitude, file: file, line: line)
+extension CLLocationCoordinate2D {
+    /// Test if self and other are approximately equal with specified tolerances.
+    /// - Parameters:
+    ///   - other: The value to which self is compared.
+    ///   - absoluteTolerance: The absolute tolerance to use in the comparison.
+    ///   - relativeTolerance: The relative tolerance to use in the comparison. Defaults to zero.
+    /// - Returns: true if self and other are equal, or if they are finite and either.
+    func isApproximatelyEqual(to other: CLLocationCoordinate2D, absoluteTolerance: Double, relativeTolerance: Double = 0) -> Bool {
+        let latitudeIsApproximatelyEqual = latitude.isApproximatelyEqual(
+            to: other.latitude,
+            absoluteTolerance: absoluteTolerance,
+            relativeTolerance: relativeTolerance
+        )
+        let longitudeIsApproximatelyEqual = longitude.isApproximatelyEqual(
+            to: other.longitude,
+            absoluteTolerance: absoluteTolerance,
+            relativeTolerance: relativeTolerance
+        )
+        return latitudeIsApproximatelyEqual && longitudeIsApproximatelyEqual
     }
 }
 

@@ -1,5 +1,5 @@
 /// Options affecting how `CLLocation` objects are converted between their GeoURI representations.
-public struct GeoURIFormatOptions: OptionSet {
+public struct GeoURIFormatOptions: OptionSet, Sendable {
     /// Normalize longitude values when converting between location objects and GeoURI strings.
     public static let normalizeLongitude = Self(rawValue: 1 << 0)
     /// Include the Coordinate Reference System (CRS) parameter in GeoURI strings representations.

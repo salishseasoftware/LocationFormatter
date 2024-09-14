@@ -1,7 +1,7 @@
 import Foundation
 
 /// The format uses to represent a `CLLocationCoordinate2d` value as a string.
-public enum CoordinateFormat: String {
+public enum CoordinateFormat: String, Codable {
     
     /// Decimal Degrees (DD).
     ///

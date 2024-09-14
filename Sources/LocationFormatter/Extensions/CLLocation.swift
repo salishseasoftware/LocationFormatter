@@ -24,16 +24,25 @@ extension CLLocation {
         }
     }
     
+    // MARK: Internal
+    
+    /// Indicates the amount of horizontal uncertainty in the location as a value in meters.
+    ///
+    /// A `nil` value indicates that the uncertainty is unknown.
     var horizontalUncertainty: CLLocationAccuracy? {
         guard horizontalAccuracy > .zero else { return nil }
         return horizontalAccuracy
     }
     
+    /// Indicates the amount of vertical uncertainty in the location as a value in meters.
+    ///
+    /// A `nil` value indicates that the uncertainty is unknown.
     var verticalUncertainty: CLLocationAccuracy? {
         guard verticalAccuracy > .zero, altitude != .zero else { return nil }
         return verticalAccuracy
     }
     
+    /// Creates a new ``CLLocation`` from a ``CLLocationCoordinate2D``.
     convenience init(coordinate: CLLocationCoordinate2D) {
         self.init(latitude: coordinate.latitude, longitude: coordinate.longitude)
     }

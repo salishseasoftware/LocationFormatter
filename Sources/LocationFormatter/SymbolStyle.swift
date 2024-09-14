@@ -1,7 +1,7 @@
 import Foundation
 
 /// Defines the characters used to annotate coordinate components.
-public enum SymbolStyle {
+public enum SymbolStyle: Codable {
     /// Uses no symbols, components must be space delimited.
     ///
     /// Example:

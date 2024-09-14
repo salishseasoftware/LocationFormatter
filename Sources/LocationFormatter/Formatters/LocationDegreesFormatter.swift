@@ -6,12 +6,13 @@ import CoreLocation
  Instances of LocationDegreesFormatter create string representations of `CLLocationDegrees` values,
  and convert textual representations of degrees into `CLLocationDegrees` values.
  
- Formatting a degree using a format and symbol style:
+ Formatting a degree using a format, a symbol style, and display options:
  ```swift
- let formatter = LocationDegreesFormatter()
- formatter.format = .decimalDegrees
- formatter.symbolStyle = .simple
- format.displayOptions = [.suffix]
+ let formatter = LocationDegreesFormatter(
+    format = .decimalDegrees,
+    symbolStyle = .simple,
+    displayOptions = [.suffix]
+ )
  
  formatter.string(from: -122.77527)
  // "122.77527° W"
@@ -19,81 +20,41 @@ import CoreLocation
  */
 public final class LocationDegreesFormatter: Formatter {
     
-    override public init() {
-        self.degreesFormat = .decimalDegrees
+    /// Creates a new LocationDegreesFormatter.
+    /// - Parameters:
+    ///   - format: The ``CoordinateFormat`` used to represent a `CLLocationDegrees` value as a string.
+    ///   - symbolStyle: The ``SymbolStyle`` used to annotate coordinate components.
+    ///   - displayOptions: The ``DisplayOptions`` for creating a textutal representation of a `CLLocationDegrees` value.
+    ///   - parsingOptions: The ``ParsingOptions`` for parsing `CLLocationDegrees` values from strings.
+    ///   - minimumDegreesFractionDigits: The minimum number of digits after the decimal separator for degrees.
+    ///   - maximumDegreesFractionDigits: The maximum number of digits after the decimal separator for degrees.
+    public init(
+        format: CoordinateFormat = .decimalDegrees,
+        symbolStyle: SymbolStyle = .traditional,
+        displayOptions: DisplayOptions = [.suffix],
+        parsingOptions: ParsingOptions = [.caseInsensitive],
+        minimumDegreesFractionDigits: Int = 1,
+        maximumDegreesFractionDigits: Int = 5
+    ) {
+        self.degreesFormat = DegreesFormat(coordinateFormat: format) ?? .decimalDegrees
+        self.symbolStyle = symbolStyle
+        self.displayOptions = displayOptions
+        self.parsingOptions = parsingOptions
+        self.minimumDegreesFractionDigits = minimumDegreesFractionDigits
+        self.maximumDegreesFractionDigits = maximumDegreesFractionDigits
+        
         super.init()
     }
     
-    public init?(format: CoordinateFormat, displayOptions: DisplayOptions = []) {
-        guard let degreeFormat = DegreesFormat(coordinateFormat: format) else {
-            assertionFailure("Unsupported coordinate format: '\(String(describing: format))'")
-            return nil
-        }
-            
-        self.degreesFormat = degreeFormat
-        self.displayOptions = displayOptions
-        super.init()
-    }
-
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: - Configuration
-
-    /// Defines whether a coordinate is expected to represent latitude or longitude.
-    ///
-    /// Default value is `.none`.
-    public var orientation: CoordinateOrientation = .none
     
-    /// The coordinate format used by the receiver.
-    public var format: CoordinateFormat {
-        get {
-            return degreesFormat.coordinateFormat
-        }
-        set {
-            guard let degreeFormat = DegreesFormat(coordinateFormat: newValue) else {
-                assertionFailure("Unsupported coordinate format: '\(String(describing: newValue))'")
-                return
-            }
-            self.degreesFormat = degreeFormat
-        }
-    }
-    
-    /// The minimum number of digits after the decimal separator for degrees.
-    ///
-    /// Default value is 1.
-    ///
-    /// - Important: Only applicable if `format` is `DegreesFormat.decimalDegrees`.
-    public var minimumDegreesFractionDigits = 1
-    
-    /// The maximum number of digits after the decimal separator for degrees.
-    ///
-    /// The default value is 5, which is accurate to 1.1132 meters (3.65 feet) at the equator.
-    ///
-    /// - Important: Only applicable if `format` is `DegreesFormat.decimalDegrees`.
-    public var maximumDegreesFractionDigits = 5
-    
-    /// Defines the characters used to annotate coordinate components.
-    ///
-    /// The default value is `SymbolStyle.simple`.
-    public var symbolStyle: SymbolStyle = .simple
-    
-    /// Options for display
-    ///
-    /// Default options include `DisplayOptions.suffx`.`
-    public var displayOptions: DisplayOptions = [.suffix]
-    
-    /// Options for parsing degree values from strings.
-    ///
-    /// Default options include `ParsingOptions.caseInsensitive`.`
-    public var parsingOptions: ParsingOptions = [.caseInsensitive]
-
     // MARK: - Public
 
     /// Returns a string containing the formatted value of the provided `CLLocationDegrees`.
-    public func string(from: CLLocationDegrees) -> String? {
+    public func string(from: CLLocationDegrees, orientation: CoordinateOrientation = .unspecified) -> String? {
         var degrees = from
 
         guard orientation.range.contains(degrees) else { return nil }
@@ -139,13 +100,11 @@ public final class LocationDegreesFormatter: Formatter {
     ///   - str: The string to be parsed.
     ///   - orientation: Expected orientation (latitude or longitude). Optional, default is none.
     /// - Returns: a `CLLocationDegrees`.
-    public func locationDegrees(from str: String, orientation: CoordinateOrientation? = nil) throws -> CLLocationDegrees {
-        if let orientation = orientation {
-            self.orientation = orientation
+    public func locationDegrees(from str: String, orientation: CoordinateOrientation = .unspecified) throws -> CLLocationDegrees {
+        let degrees = try number(for: str, orientation: orientation).doubleValue
+        guard orientation.range.contains(degrees) else {
+            throw ParsingError.invalidRangeDegrees
         }
-
-        let degrees = try number(for: str).doubleValue
-        guard self.orientation.range.contains(degrees) else { throw ParsingError.invalidRangeDegrees }
         return degrees
     }
 
@@ -153,31 +112,66 @@ public final class LocationDegreesFormatter: Formatter {
 
     override public func string(for obj: Any?) -> String? {
         guard let degrees = obj as? CLLocationDegrees else { return nil }
-        return string(from: degrees)
+        return string(from: degrees, orientation: .unspecified)
     }
 
     override public func getObjectValue(_ obj: AutoreleasingUnsafeMutablePointer<AnyObject?>?,
                                         for string: String,
                                         errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?) -> Bool {
         do {
-            obj?.pointee = try number(for: string)
+            obj?.pointee = try number(for: string, orientation: .unspecified)
             return obj?.pointee != nil
         } catch let err {
             error?.pointee = err.localizedDescription as NSString
             return false
         }
     }
-
-    // MARK: - Private
     
-    private var degreesFormat: DegreesFormat
+    // MARK: - Internal
+    
+    /// The format uses to represent a CLLocationDegrees value as a string.
+    let degreesFormat: DegreesFormat
+    
+    /// The ``SymbolStyle`` used to annotate coordinate components.
+    let symbolStyle: SymbolStyle
+    
+    /// Options for display
+    ///
+    /// Default options include `DisplayOptions.suffx`.`
+    let displayOptions: DisplayOptions
+    
+    /// Options for parsing degree values from strings.
+    ///
+    /// Default options include `ParsingOptions.caseInsensitive`.`
+    let parsingOptions: ParsingOptions
+    
+    /// The minimum number of digits after the decimal separator for degrees.
+    ///
+    /// Default value is 1.
+    ///
+    /// - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
+    let minimumDegreesFractionDigits: Int
 
-    private var isCompact: Bool {
+    /// The maximum number of digits after the decimal separator for degrees.
+    ///
+    /// Default is 5, which is accurate to 1.1132 meters (3.65 feet).
+    ///
+    ///  - Important: Only applicable if `format` is `CoordinateFormat.decimalDegrees`.
+    let maximumDegreesFractionDigits: Int
+    
+    /// The coordinate format used by the receiver.
+    var coordinateFormat: CoordinateFormat {
+        degreesFormat.coordinateFormat
+    }
+    
+    var isCompact: Bool {
         // cant be compact if not using symbols
         displayOptions.contains(.compact) && symbolStyle != .none
     }
 
-    private func degrees(inResult result: NSTextCheckingResult, for string: String) throws -> Double {
+    // MARK: - Private
+    
+    private func degrees(inResult result: NSTextCheckingResult, for string: String, orientation: CoordinateOrientation) throws -> Double {
         let degrees = try doubleValue(forName: "DEGREES", inResult: result, for: string)
         guard orientation.range.contains(degrees) else { throw ParsingError.invalidRangeDegrees }
         return degrees
@@ -234,7 +228,7 @@ public final class LocationDegreesFormatter: Formatter {
     }
 
     /// Returns a number object representing the location degrees recognized in the supplied string.
-    private func number(for string: String) throws -> NSNumber {
+    private func number(for string: String, orientation: CoordinateOrientation) throws -> NSNumber {
         let str = string.desymbolized()
 
         var options: NSRegularExpression.Options = [.useUnicodeWordBoundaries]
@@ -246,7 +240,7 @@ public final class LocationDegreesFormatter: Formatter {
             throw ParsingError.noMatch
         }
 
-        var degrees = try self.degrees(inResult: match, for: str)
+        var degrees = try self.degrees(inResult: match, for: str, orientation: orientation)
         var actualOrientation = orientation
         let direction: CoordinateHemisphere? = try resolveDirection(inResult: match, for: str)
 
@@ -258,7 +252,7 @@ public final class LocationDegreesFormatter: Formatter {
                 if degrees < 0 { degrees.negate() }
             }
 
-            if orientation != .none {
+            if orientation != .unspecified {
                 // Expected orientation does not match parsed direction
                 guard orientation == direction.orientation else { throw ParsingError.invalidDirection }
             }
@@ -272,7 +266,7 @@ public final class LocationDegreesFormatter: Formatter {
             degrees += degrees < 0 ? -minutesAsDegrees : minutesAsDegrees
         }
 
-        if format == .degreesMinutesSeconds {
+        if coordinateFormat == .degreesMinutesSeconds {
             let seconds = try self.seconds(inResult: match, for: str)
             let secondsAsDegrees = (seconds / 3600)
             degrees += degrees < 0 ? -secondsAsDegrees : secondsAsDegrees
@@ -280,12 +274,12 @@ public final class LocationDegreesFormatter: Formatter {
 
         guard actualOrientation.range.contains(degrees) else { throw ParsingError.invalidRangeDegrees }
 
-        return NSNumber(value: degrees.roundedTo(places: maximumDegreesFractionDigits))
+        return NSNumber(value: degrees.roundedTo(places: Int(maximumDegreesFractionDigits)))
     }
 
     // MARK: - Formatters
 
-    lazy var degreesFormatter: NumberFormatter = {
+    private lazy var degreesFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.locale = Locale.current
         formatter.numberStyle = .decimal
@@ -294,7 +288,7 @@ public final class LocationDegreesFormatter: Formatter {
         return formatter
     }()
 
-    lazy var minutesFormatter: NumberFormatter = {
+    private lazy var minutesFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.locale = Locale.current
         formatter.numberStyle = .decimal
